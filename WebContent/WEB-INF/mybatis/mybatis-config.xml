@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE configuration PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+
+	<!-- mapping에서 자주 사용하는 parameterType(DTO)의 경로를 작성해놓음 -->
+	<typeAliases>
+		<typeAlias type="test.spring.model.TestDTO" alias="testDTO"/> <!-- 별칭 -->
+		<typeAlias type="ch11.logon.LogonDataBean" alias="memberDTO"/> <!-- member에서 사용될 DTO -->
+		<typeAlias type="test.spring.bean.MsgDTO" alias="msgDTO"/><!-- 쪽지 -->
+	</typeAliases>
+	
+	<!-- mapper를 작성한 경로 -->
+	<mappers>
+		<mapper resource="/sql/testSQL.xml"/> <!-- <mapper resource="/WEB-INF/mybatis/testSQL.xml"/> --> 
+		<mapper resource="/sql/memberSQL.xml"/>	<!-- member에서 사용될 SQL -->
+		<mapper resource="/sql/msgSQL.xml"/><!-- 쪽지 -->
+	</mappers>
+	
+</configuration>

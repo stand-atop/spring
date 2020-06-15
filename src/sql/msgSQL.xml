@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+	PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="msg">
+	<insert id="insert" parameterType="msgDTO">
+		insert into message values(
+			message_seq.nextval,
+			#{sendid},
+			#{toid},
+			#{msg},
+			1,
+			sysdate
+		)
+	</insert>
+
+	<!-- msgAll -->
+	<select id="msgAll" resultType="msgDTO" parameterType="String">
+		select * from message where sendid=#{value} or toid=#{value}
+			order by reg desc
+	</select>
+	
+	<!-- 받은 메시지 -->
+	<select id="msgTo" resultType="msgDTO" parameterType="String">
+		select * from message where toid=#{value} order by reg desc
+	</select>
+	
+	<!-- 보낸 메시지 -->
+	<select id="msgSend" resultType="msgDTO" parameterType="String">
+		select * from message where sendid=#{value} order by reg desc
+	</select>
+	
+	<!-- 메시지 개수 -->	
+	<select id="count" resultType="int" parameterType="String">
+		select count(*) from message where toid=#{value} and state=1
+	</select>
+
+	<!-- 메시지 num -->
+	<select id="selectNum" resultType="msgDTO" parameterType="int">
+		select * from message where num=#{value}
+	</select>
+
+	<!-- 메시지 상태  -->
+	<update id="state" parameterType="int">
+		update message set state=0 where num=#{value}
+	</update>
+	
+	<!-- 메시지 삭제 -->
+	<delete id="delete" parameterType="int">
+		delete from message where num=#{num}
+	</delete>
+	
+	<select id="search" resultType="MsgDTO" parameterType="hashmap">
+		select * from message where ${ch} like '%'||#{search}||'%'
+	</select>
+	
+	
+</mapper>

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	   xmlns:context="http://www.springframework.org/schema/context" 
+	   xmlns:p="http://www.springframework.org/schema/p" 
+	   xmlns:aop="http://www.springframework.org/schema/aop"
+	   xsi:schemaLocation="http://www.springframework.org/schema/beans
+	   http://www.springframework.org/schema/beans/spring-beans.xsd
+	   http://www.springframework.org/schema/context
+	   http://www.springframework.org/schema/context/spring-context-4.3.xsd
+	   http://www.springframework.org/schema/aop
+	   http://www.springframework.org/schema/aop/spring-aop-4.3.xsd"
+>
+	<aop:aspectj-autoproxy /> <!-- 아래에 작성하는 것들에 aop를 추가? -->
+	<bean id="advice" class="test.spring.aop.Advice"/>
+	
+	<!-- 이 config 안에서 모두 작성해야함 -->
+	<aop:config>
+		<aop:pointcut expression="execution(public * test.spring.model.*Bean.git*(..))" id="p1"/><!-- 조건에 사용할 이름을 id로? -->
+					<!-- 조건 : test.spring.model패키지에 있는 것 전체 중 매개변수 상관없이 git로 시작하는 메소드 -->
+		<aop:aspect id="bf" ref="advice"> <!-- 위에서 선언한 advice클래스 -->
+<!-- 			<aop:before pointcut-ref="p1" method="before"/> advice클래스에 있는 메서드 중 위에서 선언한 p1을 실행
+			<aop:after pointcut-ref="p1" method="after"/>  -->
+			<aop:around method="around" pointcut-ref="p1"/>
+		</aop:aspect>
+	</aop:config>
+</beans>

@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	   xmlns:context="http://www.springframework.org/schema/context" 
+	   xmlns:p="http://www.springframework.org/schema/p" 
+	   xmlns:aop="http://www.springframework.org/scheme/aop"
+	   xsi:schemaLocation="http://www.springframework.org/schema/beans
+	   http://www.springframework.org/schema/beans/spring-beans.xsd
+	   http://www.springframework.org/schema/context
+	   http://www.springframework.org/schema/context/spring-context-4.3.xsd
+	   http://www.springframework.org/schema/aop
+	   http://www.springframework.org/schema/aop/spring-aop-4.3.xsd"
+>
+<!-- root-servlet.xml은 공통적인 것을 넣음 -->
+
+	<!-- Bean에서 실행할때, 앞 뒤로 주소를 붙이겠다는 의미 return 주소? -->
+	<bean id="viewResolver" 
+		class="org.springframework.web.servlet.view.InternalResourceViewResolver"> 		
+		<property name="prefix" value="/WEB-INF/views/"/> <!-- set메서드 호출 -->
+		<property name="suffix" value=".jsp"/>	
+	</bean>
+	
+	<!-- 파일업로드 중간자 : multipart라고 들어가면 대부분 파일 업로드 -->
+	<bean id="multipartResolver" 
+		class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+		<property name="maxUploadSize" value="-1"/> <!-- -1: 용량제한이 없음. 1024kb=1mb 기준으로 -->
+		<property name="defaultEncoding" value="UTF-8"/> <!-- 한글처리 -->
+	</bean>
+
+	<!-- dbcp의 커넥션툴 이용 : DAO에서 매번 DB에 연결하던 작업을 한번에 처리해 놓음. DB연결 -->
+	<bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource"
+		destroy-method="close"
+		p:driverClassName="oracle.jdbc.driver.OracleDriver"
+		p:url="jdbc:oracle:thin:@nullmaster.iptime.org:1521:orcl"
+		p:username="class11"
+		p:password="class11"
+		/>
+	<!-- mybatis를 이용하기 위한 작업 : DB연결-->
+	<bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean"> <!-- DB연결생성 -->
+		<property name="dataSource" ref="dataSource"/> <!-- 위 id=dataSource 참조 -->
+		<property name="configLocation" value="/WEB-INF/mybatis/mybatis-config.xml"/> <!-- 경로를 읽음 -->	
+	</bean>	
+	<!-- DB의 연결을 끊어주는 작업 : 메모리누수방지 -->
+	<bean id="sqlSession" class="org.mybatis.spring.SqlSessionTemplate"
+		destroy-method="clearCache">
+		<constructor-arg ref="sqlSessionFactory" /> <!-- 생성자로만 받음 -->
+		<!-- <property name="sqlSessionFactory" ref="sqlSessionFactory"/> 위 id=sqlSessionFactory를 참조. 결국 dataSouce와 sqlSessionFactory 모두 참조 -->	
+	</bean>
+</beans>
+
+
+
+
+
+
+
+
+
+
+
+

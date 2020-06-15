@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+	PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- namespace필수로 작성. mapper에 쓴 id를 호출하기 위해 꼭 써야함. 불러올때도 namespace.id로 사용 -->
+<!-- mapper : DAO역할, SQL을 호출하기 위한 인터페이스 -->
+<mapper namespace="test"> 
+
+	<!-- setId(rs.getString("id")) 컬럼을 DTO에 넣는것. 컬럼과 DTO의 데이터타입이 맞아야 가능함. 뒤죽박죽넣어봄-->	
+	<resultMap id="dto" type="testDTO">
+		<result property="id" column="name"/> 
+		<result property="pw" column="id"/>
+		<result property="name" column="pw"/>
+	</resultMap>
+	
+	<!-- <parameterMap></parameterMap> -->
+	
+	<!-- 자주사용하는 SQL을 id로 설정해놓음 -->
+	<sql id="select">
+		select * from test
+	</sql>
+	<sql id="whereId">
+		where id=#{id}
+	</sql>
+	
+	<select id="selectId">
+		<!-- select * from test where id=#{id} 와 같은 내용.-->
+		<include refid="select"/> <!-- 위에 sql태그 안에 작성한 내용을 id만으로 가져다 쓰는 것. -->
+		<include refid="whereId"/>		 <!-- 사용하는게 유지보수에 용이함 -->
+	</select>
+	
+	<!-- map을 사용해 list형식으로 결과값을 출력하는 방법 중 하나, selectAll(map사용X) -->
+	<select id="selectMap" resultMap="dto"> <!-- resultMap으로 넣어야함 -->
+		select * from test
+	</select>
+	
+	<!-- 태그 순서는 상관없음. id를 보고 출력하는 것 -->
+	<!-- DB에서 데이터를 insert할때. DAO에서 insert()메서드 라고 볼 수 있음 -->
+	<!-- parameterType : DTO처럼 입력받기 위한 것 - 패키지+클래스명. class위치를 쓰는데 자주 사용하기 때문에 config에서 별칭을 세팅해줌 -->
+	<insert id="testInsert" parameterType="testDTO"> <!-- 별칭으로 지정 -->
+		 insert into test values(#{id},#{pw},#{name},#{age},sysdate) <!-- dto변수이름 그대로 사용해서 DTO에 넣어주는 작업 -->
+	</insert>
+	
+	<select id="selectAll" resultType="testDTO"> <!-- 리스트를 따로 지정하지 않아도 됨. 어디에 저장할지만 지정하면됨 -->
+		select * from test <!-- SQL문 작성 -->		
+	</select>
+		
+<!-- 	<select id="maxNum" resultType="String" parameterType=""> resultType은 DB에서 가져올 타입. id의 타입, 매개변수의 타입? 
+		select id from test where id=#{id} parameterType은  return타입??
+	</select> -->	
+	
+	<select id="maxAge" resultType="int">
+		select max(age) from test
+	</select>
+	
+	<select id="selectName" resultType="String" parameterType="String">
+		select name from test where id=#{id}
+	</select>
+	
+	<select id="loginCheck" resultType="int" parameterType="hashmap"> <!-- java의 hashmap-key와value로 구성-->
+		select count(*) from test where id=#{id} and pw=#{pw}		
+	</select>
+	
+	<!--select * from test where id=dto.id and pw=dto.pw  일때-->
+	<!--  -->
+	<select id="idpw" resultType="testDTO" parameterType="testDTO">
+		<!-- select * from test where id=id and pw=pw
+			select * from test where id=id
+			select * from test where (and : prefixOverrides가 중복되지 않도록 지워줌) pw=pw --> 
+		<where>
+			<trim prefix="where" prefixOverrides="and|or"> <!-- prefixOverrides : and, or을 자동 삭제 -->
+				<if test="id!=null">id=#{id}</if>
+				<if test="pw!=null">and pw=#{pw}</if>			
+			</trim>
+		</where>
+	</select>
+	
+	<update id="userUpdate" parameterType="testDTO">
+		<!-- update test set pw=#{pw}, name=#{name},age=#{age} where id=#{id}-->
+		<!-- update test set pw=#{pw}, name=#{name}(, : suffixOverrides가 중복되지 않도록 지워줌) where id=#{id}-->
+		update test
+		<trim prefix="set" suffixOverrides=",">	<!-- suffixOverrides:값이 없을경우 뒤 , 를 지워줌 - 동적SQL-->
+			<if test="pw!=null">pw=#{pw},</if>
+			<if test="name!=null">name=#{name},</if>
+			<if test="age>0">age=#{age}</if>
+		</trim>
+		where id=#{id}
+	</update>
+</mapper>
