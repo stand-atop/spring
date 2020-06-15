@@ -80,14 +80,17 @@ public class MemberBean {
 	@RequestMapping("modifyForm.do")
 	public String gitmodifyForm(HttpSession session, Model model) {
 		String id = (String) session.getAttribute("memId");
-		List<LogonDataBean> list = sqlSession.selectList("member.select", id);
-		model.addAttribute("list", list);
+		//List<LogonDataBean> list = sqlSession.selectList("member.select", id);
+		//model.addAttribute("list", list);
+		LogonDataBean dto = dao.modifyForm(id);
+		model.addAttribute("dto",dto);
 		return "/member/modifyForm";
 	}
 
 	@RequestMapping("modifyPro.do")
 	public String gitmodifyPro(LogonDataBean dto) {
-		sqlSession.update("member.update", dto);
+		//sqlSession.update("member.update", dto);
+		dao.modifyPro(dto);
 		return "/member/modifyPro";
 	}
 
@@ -96,6 +99,7 @@ public class MemberBean {
 		return "/member/deleteForm";
 	}
 
+	/*
 	@RequestMapping("deletePro.do")
 	public String gitdeltePro(LogonDataBean dto, HttpSession session, Model model) {
 		String id = (String) session.getAttribute("memId");
@@ -108,7 +112,28 @@ public class MemberBean {
 		model.addAttribute("check", check);
 		return "/member/deletePro";
 	}
-
+	*/
+	
+	@RequestMapping("deletePro.do")	
+	public String gitdeletePro(HttpSession session, Model model, String passwd) {		// AOPÁ¶°Ç O
+		String id = (String)session.getAttribute("memId");
+		LogonDataBean dto = new LogonDataBean();
+		dto.setId(id);
+		dto.setPasswd(passwd);
+		
+		//int check = (int)sqlSession.selectOne("member.loginCheck",dto);
+		int check = dao.loginCheck(dto);
+		if(check == 1) {
+			//sqlSession.delete("member.deletePro", dto);
+			dao.deletePro(dto);
+			session.removeAttribute("memId");
+		}
+		model.addAttribute("check", check);
+		
+		return "/member/deletePro";
+	}
+	
+	
 	@RequestMapping("logout.do")
 	public String gitlogout(HttpSession session) {
 		session.invalidate();

@@ -11,6 +11,7 @@ public class MemberDAO {
 	//mybatis를 사용하기 위한 작업. mybatis는 컨트롤에 세팅되어있음.
 	//@Autowired는 사용할 수 없음. @Controller가 있을 때 @Autowired를 사용할 수 있음
 	private SqlSessionTemplate sqlSession = null;  
+	
 	public MemberDAO(SqlSessionTemplate sqlSession) { //생성자를 통해 받아옴
 		this.sqlSession = sqlSession;
 	}
@@ -40,10 +41,23 @@ public class MemberDAO {
 		
 	}
 	
-	
 	public int chat(String id) {
 		int check = (int)sqlSession.selectOne("member.chatIdCheck", id);
 		return check;
+	}
+	
+	public LogonDataBean modifyForm(String id) {
+		LogonDataBean dto = (LogonDataBean)sqlSession.selectOne("member.modifyForm", id);
+		
+		return dto;
+	}
+	
+	public void modifyPro(LogonDataBean dto) {
+		sqlSession.update("member.modifyPro",dto);		
+	}
+	
+	public void deletePro(LogonDataBean dto) {
+		sqlSession.delete("member.deletePro", dto);
 	}
 	
 	
